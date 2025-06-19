@@ -2,17 +2,36 @@ const fs=require('node:fs')
 const path=require('node:path')
 const { REST, Routes } = require('discord.js');
 
-const {Client,Collection,Events,GatewayIntentBits,MessageFlags}=require('discord.js')
+const {Client,Collection,Events,GatewayIntentBits,MessageFlags,Intents}=require('discord.js')
 
 require('dotenv').config() 
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds,GatewayIntentBits.GuildMessages,GatewayIntentBits.MessageContent] });
+const client = new Client({ intents: [GatewayIntentBits.Guilds,GatewayIntentBits.GuildMessages,GatewayIntentBits.MessageContent,GatewayIntentBits.GuildMembers] });
 
 const commands = []; //so that I can load commands to discord
 client.commands = new Collection(); //this if for the bot
 
-
-
+// client.on('messageCreate',(message)=>{
+//     if(message.author.bot) return;
+	
+//     if(message.content.startsWith('create')){
+//         const url=message.content.split('create')[1]
+//         return message.reply({
+//             content:"Generating short ID for :"+url
+//         })
+//     }
+//     message.reply({
+//         content:"You are a monkey"
+//     })
+    
+// })
+client.on('guildMemberAdd',member=>{
+	member.send(`Welcome to the server,${member.user.username}`)
+	.catch(error=>{
+		console.log("could not send dm welcome message");
+		
+	})
+})
 const foldersPath = path.join(__dirname, 'commands');
 const commandFolders = fs.readdirSync(foldersPath);
 
@@ -71,7 +90,10 @@ const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
 		console.error(error);
 	}
 })();
-
+client.on('ready',()=>{
+	console.log("Bot is listening");
+	
+})
 
 client.login(process.env.DISCORD_TOKEN)
 // client.on(Events.InteractionCreate,interaction=>{
@@ -117,19 +139,7 @@ client.login(process.env.DISCORD_TOKEN)
 require('dotenv').config() 
 const client=new Client({intents:[GatewayIntentBits.Guilds,GatewayIntentBits.GuildMessages,GatewayIntentBits.MessageContent]})
 
-client.on('messageCreate',(message)=>{
-    if(message.author.bot) return;
-    if(message.content.startsWith('create')){
-        const url=message.content.split('create')[1]
-        return message.reply({
-            content:"Generating short ID for :"+url
-        })
-    }
-    message.reply({
-        content:"Hi from bot"
-    })
-    
-})
+
 client.on('interactionCreate',(interaction)=>{
     console.log(interaction.reply("You are a monkey"));
     
